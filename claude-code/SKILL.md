@@ -6,20 +6,20 @@ description: >-
   Trigger on: brainstorm, 头脑风暴, 多角度, 讨论, 探索方案, 团队讨论, creative exploration.
 ---
 
-# Relay Brainstorm — 多 Agent 头脑风暴团队
+# Relay Brainstorm — Claude Code 适配层
 
-一个总指挥协调多个专家 agent，围绕话题进行动态讨论，最终产出结构化方案。
+本文件是 Claude Code 专用的技能入口。通用版本请看项目根目录的 `workflow.md`。
 
 ## 角色
 
-| 角色 | 职责 | Agent 文件 | 参考资料 |
-|------|------|-----------|---------|
-| 总指挥 (Commander) | 拟大纲、定方向、审查发言、调度专家、整合结论 | `./agents/commander/agent.md` | `./agents/commander/examples/` |
-| 技术专家 (Tech Expert) | 技术可行性、架构方案、实现难度 | `./agents/tech-expert/agent.md` | `./agents/tech-expert/references/` |
-| 用户研究员 (User Researcher) | 用户需求、体验、痛点 | `./agents/user-researcher/agent.md` | `./agents/user-researcher/references/` |
-| 商业分析师 (Business Analyst) | 成本、收益、市场竞争 | `./agents/business-analyst/agent.md` | `./agents/business-analyst/references/` |
-| 创意激发者 (Creative Catalyst) | 跨界联想、反直觉创意 | `./agents/creative-catalyst/agent.md` | `./agents/creative-catalyst/references/` |
-| 反驳者 (Devil's Advocate) | 挑战假设、找漏洞、压力测试 | `./agents/devils-advocate/agent.md` | `./agents/devils-advocate/references/` |
+| 角色 | 职责 | Prompt 文件 | 参考资料 |
+|------|------|------------|---------|
+| 总指挥 (Commander) | 拟大纲、定方向、审查发言、调度专家、整合结论 | `../prompts/commander.md` | `../references/integration-template.md` |
+| 技术专家 (Tech Expert) | 技术可行性、架构方案、实现难度 | `../prompts/tech-expert.md` | `../references/tech-checklist.md` |
+| 用户研究员 (User Researcher) | 用户需求、体验、痛点 | `../prompts/user-researcher.md` | `../references/persona-template.md` |
+| 商业分析师 (Business Analyst) | 成本、收益、市场竞争 | `../prompts/business-analyst.md` | `../references/market-analysis.md` |
+| 创意激发者 (Creative Catalyst) | 跨界联想、反直觉创意 | `../prompts/creative-catalyst.md` | `../references/brainstorming-techniques.md` |
+| 反驳者 (Devil's Advocate) | 挑战假设、找漏洞、压力测试 | `../prompts/devils-advocate.md` | `../references/common-fallacies.md` |
 
 ## 流程
 
@@ -53,11 +53,11 @@ description: >-
 
 ### Step 3: Dispatch 总指挥
 
-读取 `agents/commander/agent.md`。
+读取 `../prompts/commander.md` 和 `../references/integration-template.md`。
 
 用 Agent 工具 dispatch 总指挥：
 - model: opus（需要最强推理能力）
-- prompt: agent.md 内容 + 话题 + 项目上下文 + 可用专家列表
+- prompt: prompt 内容 + 参考资料 + 话题 + 项目上下文 + 可用专家列表
 
 总指挥会返回：
 - 讨论大纲
@@ -67,9 +67,9 @@ description: >-
 ### Step 4: 按总指挥指示召唤专家
 
 根据总指挥的指示，依次 dispatch 专家 agent：
-- 读取对应的 `agents/[角色]/agent.md`
+- 读取对应的 `../prompts/[角色].md` 和参考资料
 - 用 Agent 工具 dispatch，model: sonnet
-- prompt: agent.md 内容 + 话题 + 讨论大纲 + 该专家的焦点问题 + 之前专家的发言（如有）
+- prompt: prompt 内容 + 参考资料 + 话题 + 讨论大纲 + 该专家的焦点问题 + 之前专家的发言（如有）
 
 收到专家输出后：
 - 创建新任务记录该专家的发言
@@ -106,25 +106,3 @@ description: >-
 - **总指挥必须审查** — 每个专家发言后，总指挥必须给出评价和下一步指示
 - **反驳者很重要** — 总指挥应该在适当时机召唤反驳者挑战共识
 - **尊重用户** — 最终决定权在用户，总指挥的方案只是建议
-
-## Agent 定义
-
-每个 agent 有独立文件夹，包含 `agent.md`（YAML frontmatter + 结构化 body）和可选的 references/examples。
-
-- `./agents/commander/agent.md` — 总指挥（model: opus）
-- `./agents/tech-expert/agent.md` — 技术专家（model: sonnet）
-- `./agents/user-researcher/agent.md` — 用户研究员（model: sonnet）
-- `./agents/business-analyst/agent.md` — 商业分析师（model: sonnet）
-- `./agents/creative-catalyst/agent.md` — 创意激发者（model: sonnet）
-- `./agents/devils-advocate/agent.md` — 反驳者（model: sonnet）
-
-### 参考资料
-
-| Agent | References | 用途 |
-|-------|-----------|------|
-| 总指挥 | `examples/integration-template.md` | 整合方案的输出模板 |
-| 技术专家 | `references/tech-checklist.md` | 技术分析检查清单 |
-| 用户研究员 | `references/persona-template.md` | 用户画像构建模板 |
-| 商业分析师 | `references/market-analysis.md` | 市场分析框架 |
-| 创意激发者 | `references/brainstorming-techniques.md` | 创意激发技巧库 |
-| 反驳者 | `references/common-fallacies.md` | 常见逻辑谬误清单 |
